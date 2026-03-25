@@ -1,23 +1,80 @@
 <!doctype html>
-<html>
+<html lang="en">
   <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>SafeNet AI</title>
     <link rel="stylesheet" href="style.css" />
   </head>
   <body>
     <div class="container">
-      <h2>🛡️ SafeNet AI</h2>
-      <p>Your web safety shield is active.</p>
-      <hr />
-      <div class="toggle-group">
-        <label>Block Adult Content</label>
-        <input type="checkbox" id="nsfw-toggle" checked />
+      <!-- Header -->
+      <div class="header">
+        <div class="icon-circle">🛡️</div>
+        <h1>SafeNet AI</h1>
+        <p class="status-text active">● Shield Active</p>
       </div>
-      <div class="toggle-group">
-        <label>Block Gore/Violence</label>
-        <input type="checkbox" id="gore-toggle" checked />
+
+      <!-- Status Card -->
+      <div class="status-card">
+        <div class="status-badge">
+          <div class="pulse-circle"></div>
+          <span>Protection Enabled</span>
+        </div>
+        <p class="subtitle">Real-time AI-powered content filtering</p>
       </div>
-      <div class="stats">Blocked today: <span id="block-count">0</span></div>
+
+      <!-- Controls Section -->
+      <div class="controls-section">
+        <div class="control-item">
+          <div class="control-header">
+            <div class="control-icon adult">👤</div>
+            <div class="control-text">
+              <label class="control-label">Block Adult Content</label>
+              <p class="control-desc">NSFW imagery & content</p>
+            </div>
+          </div>
+          <label class="switch">
+            <input type="checkbox" id="nsfw-toggle" checked />
+            <span class="slider"></span>
+          </label>
+        </div>
+
+        <div class="control-item">
+          <div class="control-header">
+            <div class="control-icon gore">⚠️</div>
+            <div class="control-text">
+              <label class="control-label">Block Gore/Violence</label>
+              <p class="control-desc">Graphic & violent content</p>
+            </div>
+          </div>
+          <label class="switch">
+            <input type="checkbox" id="gore-toggle" checked />
+            <span class="slider"></span>
+          </label>
+        </div>
+      </div>
+
+      <!-- Stats Card -->
+      <div class="stats-card">
+        <div class="stat-item">
+          <span class="stat-label">Blocked Today</span>
+          <span class="stat-value" id="block-count">0</span>
+        </div>
+        <div class="stat-divider"></div>
+        <div class="stat-item">
+          <span class="stat-label">Filter Status</span>
+          <span class="stat-value" id="status">Active</span>
+        </div>
+      </div>
+
+      <!-- Footer -->
+      <div class="footer">
+        <button class="btn-secondary" id="reset-btn">Reset Stats</button>
+        <button class="btn-primary" id="settings-btn">Settings</button>
+      </div>
     </div>
+
     <script src="popup.js"></script>
   </body>
 </html>
