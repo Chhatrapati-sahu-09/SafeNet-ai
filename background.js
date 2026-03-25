@@ -18,6 +18,12 @@ chrome.runtime.onInstalled.addListener(() => {
       chrome.storage.sync.set(updates);
     }
   });
+
+  chrome.storage.local.get(["mode"], (result) => {
+    if (!["strict", "balanced", "off"].includes(result.mode)) {
+      chrome.storage.local.set({ mode: "strict" });
+    }
+  });
 });
 
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {

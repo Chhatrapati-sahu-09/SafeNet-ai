@@ -4,8 +4,9 @@ console.log("🛡️ SafeNet AI: Content Shield Active");
 
 let nsfwEnabled = true;
 let goreEnabled = true;
+let mode = "strict";
 
-const isFilteringEnabled = () => nsfwEnabled || goreEnabled;
+const isFilteringEnabled = () => mode !== "off" && (nsfwEnabled || goreEnabled);
 
 const NSFW_KEYWORDS = ["nsfw", "adult", "nude", "porn", "explicit", "sex"];
 const GORE_KEYWORDS = ["gore", "blood", "kill", "violent", "weapon", "fight"];
@@ -50,8 +51,23 @@ function addLabel(img, text) {
 }
 
 // 1. Function to apply the "Safe Shield" (Blur)
+const shouldBlockInMode = (risk) => {
+  if (mode === "strict") {
+    return risk > 40;
+  }
+
+  if (mode === "balanced") {
+    return risk > 70;
+  }
+
+  return false;
+};
+
 const applyShield = (element, nsfwScore, goreScore, risk) => {
-  if (element.getAttribute("data-safenet-blocked") === "true" || risk <= 70) {
+  if (
+    element.getAttribute("data-safenet-blocked") === "true" ||
+    !shouldBlockInMode(risk)
+  ) {
     return;
   }
 
@@ -107,11 +123,21 @@ chrome.storage.sync.get(["nsfw-enabled", "gore-enabled"], (result) => {
   if (result["gore-enabled"] !== undefined) {
     goreEnabled = result["gore-enabled"];
   }
+});
+
+chrome.storage.local.get(["mode"], (result) => {
+  if (["strict", "balanced", "off"].includes(result.mode)) {
+    mode = result.mode;
+  }
   startScanner();
 });
 
 chrome.storage.onChanged.addListener((changes, area) => {
   if (area !== "sync") {
+    if (area === "local" && changes.mode) {
+      mode = changes.mode.newValue;
+      scanImages();
+    }
     return;
   }
 

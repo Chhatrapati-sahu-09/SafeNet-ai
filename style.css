@@ -141,6 +141,10 @@ body {
   border-color: #d1d5db;
 }
 
+.mode-item {
+  gap: 12px;
+}
+
 .control-header {
   display: flex;
   align-items: center;
@@ -184,6 +188,16 @@ body {
   font-size: 12px;
   color: #9ca3af;
   margin: 0;
+}
+
+.mode-select {
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+  padding: 8px;
+  background: #fff;
+  color: #1f2937;
+  font-weight: 600;
+  min-width: 108px;
 }
 
 /* Toggle Switch */

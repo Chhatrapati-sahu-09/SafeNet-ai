@@ -5,6 +5,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const blockCount = document.getElementById("block-count");
   const resetBtn = document.getElementById("reset-btn");
   const settingsBtn = document.getElementById("settings-btn");
+  const modeSelect = document.getElementById("mode-select");
 
   // Load saved toggle states
   chrome.storage.sync.get(
@@ -21,6 +22,12 @@ document.addEventListener("DOMContentLoaded", () => {
       }
     },
   );
+
+  chrome.storage.local.get(["mode"], (result) => {
+    if (["strict", "balanced", "off"].includes(result.mode)) {
+      modeSelect.value = result.mode;
+    }
+  });
 
   // NSFW Toggle listener
   nsfwToggle.addEventListener("change", () => {
@@ -50,6 +57,10 @@ document.addEventListener("DOMContentLoaded", () => {
   // Settings button
   settingsBtn.addEventListener("click", () => {
     chrome.runtime.openOptionsPage();
+  });
+
+  modeSelect.addEventListener("change", () => {
+    chrome.storage.local.set({ mode: modeSelect.value });
   });
 });
 
