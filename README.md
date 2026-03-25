@@ -18,8 +18,7 @@ Implemented now:
 Not fully implemented yet:
 
 - Real AI image classification (the content script currently blurs first, then logs analysis placeholders).
-- Background workflow logic (background.js is present but currently empty).
-- Options page (popup includes a settings action, but no options page is defined in manifest).
+- Domain-level controls (allowlist, temporary pause, per-site policies).
 
 ## Features
 
@@ -69,11 +68,29 @@ Not fully implemented yet:
 - Extension name: SafeNet AI
 - Version: 1.0
 
+## Error Fixes Included In This Update
+
+The project had some functional errors that are now fixed:
+
+- Error: Settings button opened options flow without a registered options page.
+  - Fix: Added options page support in manifest and created options UI files.
+  - Updated files: manifest.json, options.html, options.js
+
+- Error: Background service worker had no message listeners, while popup/content scripts were sending runtime messages.
+  - Fix: Implemented runtime message handling in background script for filter updates, counter reset, and counter increment.
+  - Updated files: background.js
+
+- Error: Content script tried to observe document.body at document_start, which can be unavailable on some pages and may cause startup issues.
+  - Fix: Added safe startup flow that reads settings first and only starts observer when body exists.
+  - Updated files: content.js
+
+- Error: Block count restore in popup skipped value 0 because of a truthy check.
+  - Fix: Changed to an explicit undefined check and synced reset action with background script.
+  - Updated files: popup.js
+
 ## Next Roadmap
 
 - Connect image classification model/API for real NSFW and gore detection.
-- Implement background service worker message handling.
-- Add and register options page in manifest.
 - Track blocked count from content/background events.
 - Add domain allowlist and temporary pause mode.
 

@@ -16,7 +16,7 @@ document.addEventListener("DOMContentLoaded", () => {
       if (result["gore-enabled"] !== undefined) {
         goreToggle.checked = result["gore-enabled"];
       }
-      if (result["blocked-count"]) {
+      if (result["blocked-count"] !== undefined) {
         blockCount.textContent = result["blocked-count"];
       }
     },
@@ -43,6 +43,7 @@ document.addEventListener("DOMContentLoaded", () => {
   // Reset Stats button
   resetBtn.addEventListener("click", () => {
     chrome.storage.sync.set({ "blocked-count": 0 });
+    chrome.runtime.sendMessage({ action: "resetBlockCount" });
     blockCount.textContent = "0";
   });
 
