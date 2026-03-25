@@ -76,6 +76,18 @@ const applyShield = (element, nsfwScore, goreScore, risk) => {
   element.setAttribute("data-safenet-blocked", "true");
   element.title = `Blocked: NSFW ${Math.round(nsfwScore * 100)}% | Gore ${Math.round(goreScore * 100)}%`;
   addLabel(element, `Blocked (${Math.round(risk)}%)`);
+
+  element.onclick = () => {
+    element.style.filter = "none";
+    element.removeAttribute("data-safenet-blocked");
+    if (element.parentElement) {
+      const badge = element.parentElement.querySelector(".safenet-label");
+      if (badge) {
+        badge.remove();
+      }
+    }
+  };
+
   chrome.runtime.sendMessage({ action: "incrementBlockCount" });
 };
 
