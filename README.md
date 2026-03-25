@@ -8,6 +8,23 @@ Current goal: detect and block NSFW and gore-related images on websites.
 
 This repository is an early implementation.
 
+### Current Situation
+
+SafeNet AI is in prototype stage. Core extension flows are working (image scan, blur shield, popup controls, mode selection, click-to-reveal, and basic stats), but the project is not production-ready yet.
+
+What is working now:
+
+- Extension loads and runs on websites.
+- Risk-based blocking flow with Strict/Balanced/Off modes.
+- Popup controls and settings persistence.
+- Trusted-site bypass and small-image skip logic.
+
+What is still pending:
+
+- Real AI model integration for accurate NSFW/gore classification.
+- Advanced options (editable trusted sites, custom thresholds, per-site controls).
+- Full testing and performance hardening for production use.
+
 Implemented now:
 
 - Popup UI with toggles for NSFW and gore filters.
@@ -97,3 +114,11 @@ The project had some functional errors that are now fixed:
 ## Disclaimer
 
 SafeNet AI is a prototype and should not be treated as a complete safety solution yet. False positives and false negatives are expected until classifier integration is complete.
+
+## Need Help?
+
+If you need help with setup, bugs, or feature requests, please open an issue in this repository.
+
+## Help Wanted
+
+I want help to complete this project. If you would like to contribute, please open an issue or submit a pull request.

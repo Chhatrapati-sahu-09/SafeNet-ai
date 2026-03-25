@@ -17,7 +17,8 @@ const trustedSites = ["youtube.com", "google.com"];
 
 const isTrustedSite = () =>
   trustedSites.some(
-    (site) => location.hostname === site || location.hostname.endsWith(`.${site}`),
+    (site) =>
+      location.hostname === site || location.hostname.endsWith(`.${site}`),
   );
 
 const inferScore = (text, keywords) => {
@@ -125,7 +126,10 @@ const applyShield = (element, nsfwScore, goreScore, risk) => {
 
   blockedCount += 1;
   chrome.storage.local.set({ blocked: blockedCount });
-  chrome.runtime.sendMessage({ action: "updateBlockCount", count: blockedCount });
+  chrome.runtime.sendMessage({
+    action: "updateBlockCount",
+    count: blockedCount,
+  });
 };
 
 // 2. The Scanner: Finds all images on the page

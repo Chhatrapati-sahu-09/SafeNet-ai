@@ -8,17 +8,14 @@ document.addEventListener("DOMContentLoaded", () => {
   const modeSelect = document.getElementById("mode-select");
 
   // Load saved toggle states
-  chrome.storage.sync.get(
-    ["nsfw-enabled", "gore-enabled"],
-    (result) => {
-      if (result["nsfw-enabled"] !== undefined) {
-        nsfwToggle.checked = result["nsfw-enabled"];
-      }
-      if (result["gore-enabled"] !== undefined) {
-        goreToggle.checked = result["gore-enabled"];
-      }
-    },
-  );
+  chrome.storage.sync.get(["nsfw-enabled", "gore-enabled"], (result) => {
+    if (result["nsfw-enabled"] !== undefined) {
+      nsfwToggle.checked = result["nsfw-enabled"];
+    }
+    if (result["gore-enabled"] !== undefined) {
+      goreToggle.checked = result["gore-enabled"];
+    }
+  });
 
   chrome.storage.local.get(["blocked"], (result) => {
     blockCount.textContent = String(Number(result.blocked || 0));
