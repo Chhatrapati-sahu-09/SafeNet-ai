@@ -2,14 +2,14 @@
 document.addEventListener("DOMContentLoaded", () => {
   const nsfwToggle = document.getElementById("nsfw-toggle");
   const goreToggle = document.getElementById("gore-toggle");
-  const blockCount = document.getElementById("block-count");
+  const blockCount = document.getElementById("count");
   const resetBtn = document.getElementById("reset-btn");
   const settingsBtn = document.getElementById("settings-btn");
   const modeSelect = document.getElementById("mode-select");
 
   // Load saved toggle states
   chrome.storage.sync.get(
-    ["nsfw-enabled", "gore-enabled", "blocked-count"],
+    ["nsfw-enabled", "gore-enabled"],
     (result) => {
       if (result["nsfw-enabled"] !== undefined) {
         nsfwToggle.checked = result["nsfw-enabled"];
@@ -17,11 +17,12 @@ document.addEventListener("DOMContentLoaded", () => {
       if (result["gore-enabled"] !== undefined) {
         goreToggle.checked = result["gore-enabled"];
       }
-      if (result["blocked-count"] !== undefined) {
-        blockCount.textContent = result["blocked-count"];
-      }
     },
   );
+
+  chrome.storage.local.get(["blocked"], (result) => {
+    blockCount.textContent = String(Number(result.blocked || 0));
+  });
 
   chrome.storage.local.get(["mode"], (result) => {
     if (["strict", "balanced", "off"].includes(result.mode)) {
@@ -49,8 +50,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // Reset Stats button
   resetBtn.addEventListener("click", () => {
-    chrome.storage.sync.set({ "blocked-count": 0 });
-    chrome.runtime.sendMessage({ action: "resetBlockCount" });
+    chrome.storage.local.set({ blocked: 0 });
     blockCount.textContent = "0";
   });
 
@@ -67,6 +67,6 @@ document.addEventListener("DOMContentLoaded", () => {
 // Listen for updates from background script
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
   if (request.action === "updateBlockCount") {
-    document.getElementById("block-count").textContent = request.count;
+    document.getElementById("count").textContent = request.count;
   }
 });

@@ -24,6 +24,12 @@ chrome.runtime.onInstalled.addListener(() => {
       chrome.storage.local.set({ mode: "strict" });
     }
   });
+
+  chrome.storage.local.get(["blocked"], (result) => {
+    if (result.blocked === undefined) {
+      chrome.storage.local.set({ blocked: 0 });
+    }
+  });
 });
 
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {

@@ -5,6 +5,7 @@ console.log("🛡️ SafeNet AI: Content Shield Active");
 let nsfwEnabled = true;
 let goreEnabled = true;
 let mode = "strict";
+let blockedCount = 0;
 
 const isFilteringEnabled = () => mode !== "off" && (nsfwEnabled || goreEnabled);
 
@@ -88,7 +89,9 @@ const applyShield = (element, nsfwScore, goreScore, risk) => {
     }
   };
 
-  chrome.runtime.sendMessage({ action: "incrementBlockCount" });
+  blockedCount += 1;
+  chrome.storage.local.set({ blocked: blockedCount });
+  chrome.runtime.sendMessage({ action: "updateBlockCount", count: blockedCount });
 };
 
 // 2. The Scanner: Finds all images on the page
@@ -142,6 +145,10 @@ chrome.storage.local.get(["mode"], (result) => {
     mode = result.mode;
   }
   startScanner();
+});
+
+chrome.storage.local.get(["blocked"], (result) => {
+  blockedCount = Number(result.blocked || 0);
 });
 
 chrome.storage.onChanged.addListener((changes, area) => {
