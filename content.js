@@ -132,6 +132,13 @@ const scanImages = async () => {
 
   for (const img of imgs) {
     img.setAttribute("data-safenet-scanned", "true");
+
+    const imgWidth = img.naturalWidth || img.width;
+    const imgHeight = img.naturalHeight || img.height;
+    if (imgWidth > 0 && imgHeight > 0 && (imgWidth < 100 || imgHeight < 100)) {
+      continue;
+    }
+
     const { nsfwScore, goreScore, risk } = await getImageScores(img);
 
     // Temporarily hide/blur until AI confirms it's safe.
