@@ -6,6 +6,8 @@ let nsfwEnabled = true;
 let goreEnabled = true;
 let mode = "strict";
 let blockedCount = 0;
+let model;
+let modelInitPromise;
 
 const isFilteringEnabled = () => mode !== "off" && (nsfwEnabled || goreEnabled);
 
@@ -18,10 +20,36 @@ const inferScore = (text, keywords) => {
   return Math.min(hits / 2, 1);
 };
 
-const getImageScores = (img) => {
-  const signalText = `${img.src || ""} ${img.alt || ""} ${img.title || ""}`;
-  const nsfwScore = inferScore(signalText, NSFW_KEYWORDS);
-  const goreScore = inferScore(signalText, GORE_KEYWORDS);
+const loadModel = async () => {
+  // Placeholder until external model integration is added.
+  return {
+    predict(img) {
+      const signalText = `${img.src || ""} ${img.alt || ""} ${img.title || ""}`;
+      const nsfwScore = inferScore(signalText, NSFW_KEYWORDS);
+      const goreScore = inferScore(signalText, GORE_KEYWORDS);
+      return { nsfwScore, goreScore };
+    },
+  };
+};
+
+async function init() {
+  if (model) {
+    return model;
+  }
+
+  if (!modelInitPromise) {
+    modelInitPromise = loadModel().then((loadedModel) => {
+      model = loadedModel;
+      return model;
+    });
+  }
+
+  return modelInitPromise;
+}
+
+const getImageScores = async (img) => {
+  const activeModel = await init();
+  const { nsfwScore, goreScore } = activeModel.predict(img);
   const risk = (nsfwScore * 0.7 + goreScore * 0.3) * 100;
 
   return { nsfwScore, goreScore, risk };
@@ -95,31 +123,31 @@ const applyShield = (element, nsfwScore, goreScore, risk) => {
 };
 
 // 2. The Scanner: Finds all images on the page
-const scanImages = () => {
+const scanImages = async () => {
   if (!isFilteringEnabled()) {
     return;
   }
 
   const imgs = document.querySelectorAll("img:not([data-safenet-scanned])");
 
-  imgs.forEach((img) => {
+  for (const img of imgs) {
     img.setAttribute("data-safenet-scanned", "true");
-    const { nsfwScore, goreScore, risk } = getImageScores(img);
+    const { nsfwScore, goreScore, risk } = await getImageScores(img);
 
     // Temporarily hide/blur until AI confirms it's safe.
     applyShield(img, nsfwScore, goreScore, risk);
 
     console.log("Analyzing image...", img.src, "Risk:", Math.round(risk));
-  });
+  }
 };
 
 // 3. The Advanced Observer: Detects new images when scrolling
 const observer = new MutationObserver(() => {
-  scanImages();
+  void scanImages();
 });
 
 const startScanner = () => {
-  scanImages();
+  void scanImages();
 
   if (!document.body) {
     return;
@@ -155,7 +183,7 @@ chrome.storage.onChanged.addListener((changes, area) => {
   if (area !== "sync") {
     if (area === "local" && changes.mode) {
       mode = changes.mode.newValue;
-      scanImages();
+      void scanImages();
     }
     return;
   }
@@ -168,5 +196,5 @@ chrome.storage.onChanged.addListener((changes, area) => {
     goreEnabled = changes["gore-enabled"].newValue;
   }
 
-  scanImages();
+  void scanImages();
 });
