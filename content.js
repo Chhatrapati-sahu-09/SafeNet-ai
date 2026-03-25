@@ -13,6 +13,12 @@ const isFilteringEnabled = () => mode !== "off" && (nsfwEnabled || goreEnabled);
 
 const NSFW_KEYWORDS = ["nsfw", "adult", "nude", "porn", "explicit", "sex"];
 const GORE_KEYWORDS = ["gore", "blood", "kill", "violent", "weapon", "fight"];
+const trustedSites = ["youtube.com", "google.com"];
+
+const isTrustedSite = () =>
+  trustedSites.some(
+    (site) => location.hostname === site || location.hostname.endsWith(`.${site}`),
+  );
 
 const inferScore = (text, keywords) => {
   const lowerText = text.toLowerCase();
@@ -124,6 +130,10 @@ const applyShield = (element, nsfwScore, goreScore, risk) => {
 
 // 2. The Scanner: Finds all images on the page
 const scanImages = async () => {
+  if (isTrustedSite()) {
+    return;
+  }
+
   if (!isFilteringEnabled()) {
     return;
   }
@@ -154,6 +164,11 @@ const observer = new MutationObserver(() => {
 });
 
 const startScanner = () => {
+  if (isTrustedSite()) {
+    console.log("SafeNet bypass enabled for trusted site:", location.hostname);
+    return;
+  }
+
   void scanImages();
 
   if (!document.body) {
