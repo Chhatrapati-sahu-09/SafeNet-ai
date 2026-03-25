@@ -1,0 +1,23 @@
+<!doctype html>
+<html>
+  <head>
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <div class="container">
+      <h2>🛡️ SafeNet AI</h2>
+      <p>Your web safety shield is active.</p>
+      <hr />
+      <div class="toggle-group">
+        <label>Block Adult Content</label>
+        <input type="checkbox" id="nsfw-toggle" checked />
+      </div>
+      <div class="toggle-group">
+        <label>Block Gore/Violence</label>
+        <input type="checkbox" id="gore-toggle" checked />
+      </div>
+      <div class="stats">Blocked today: <span id="block-count">0</span></div>
+    </div>
+    <script src="popup.js"></script>
+  </body>
+</html>
