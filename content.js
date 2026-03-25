@@ -7,15 +7,59 @@ let goreEnabled = true;
 
 const isFilteringEnabled = () => nsfwEnabled || goreEnabled;
 
+const NSFW_KEYWORDS = ["nsfw", "adult", "nude", "porn", "explicit", "sex"];
+const GORE_KEYWORDS = ["gore", "blood", "kill", "violent", "weapon", "fight"];
+
+const inferScore = (text, keywords) => {
+  const lowerText = text.toLowerCase();
+  const hits = keywords.filter((keyword) => lowerText.includes(keyword)).length;
+  return Math.min(hits / 2, 1);
+};
+
+const getImageScores = (img) => {
+  const signalText = `${img.src || ""} ${img.alt || ""} ${img.title || ""}`;
+  const nsfwScore = inferScore(signalText, NSFW_KEYWORDS);
+  const goreScore = inferScore(signalText, GORE_KEYWORDS);
+  const risk = (nsfwScore * 0.7 + goreScore * 0.3) * 100;
+
+  return { nsfwScore, goreScore, risk };
+};
+
+function addLabel(img, text) {
+  if (!img.parentElement || img.parentElement.querySelector(".safenet-label")) {
+    return;
+  }
+
+  const label = document.createElement("div");
+  label.className = "safenet-label";
+  label.innerText = text;
+
+  label.style.position = "absolute";
+  label.style.top = "6px";
+  label.style.left = "6px";
+  label.style.zIndex = "9999";
+  label.style.background = "red";
+  label.style.color = "white";
+  label.style.fontSize = "12px";
+  label.style.fontWeight = "700";
+  label.style.padding = "4px 6px";
+  label.style.borderRadius = "4px";
+
+  img.parentElement.style.position = "relative";
+  img.parentElement.appendChild(label);
+}
+
 // 1. Function to apply the "Safe Shield" (Blur)
-const applyShield = (element) => {
-  if (element.getAttribute("data-safenet-blocked") === "true") {
+const applyShield = (element, nsfwScore, goreScore, risk) => {
+  if (element.getAttribute("data-safenet-blocked") === "true" || risk <= 70) {
     return;
   }
 
   element.style.filter = "blur(30px) grayscale(100%)";
   element.style.transition = "filter 0.5s ease";
   element.setAttribute("data-safenet-blocked", "true");
+  element.title = `Blocked: NSFW ${Math.round(nsfwScore * 100)}% | Gore ${Math.round(goreScore * 100)}%`;
+  addLabel(element, `Blocked (${Math.round(risk)}%)`);
   chrome.runtime.sendMessage({ action: "incrementBlockCount" });
 };
 
@@ -29,12 +73,12 @@ const scanImages = () => {
 
   imgs.forEach((img) => {
     img.setAttribute("data-safenet-scanned", "true");
+    const { nsfwScore, goreScore, risk } = getImageScores(img);
 
-    // Temporarily hide/blur until AI confirms it's safe (Strict Mode)
-    applyShield(img);
+    // Temporarily hide/blur until AI confirms it's safe.
+    applyShield(img, nsfwScore, goreScore, risk);
 
-    // In Phase 2, we will send this to the AI model
-    console.log("Analyzing image...", img.src);
+    console.log("Analyzing image...", img.src, "Risk:", Math.round(risk));
   });
 };
 
