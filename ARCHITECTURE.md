@@ -138,3 +138,30 @@ sequenceDiagram
 - Move to single-source blocked counter ownership.
 - Add policy engine for per-domain allowlist and temporary bypass.
 - Introduce confidence thresholds as configurable settings.
+
+## Operational Boundaries
+
+- Manifest V3 service worker lifecycle is event-driven and non-persistent.
+- Content analysis is currently client-side and limited to lightweight heuristics.
+- No external API calls are active in the present implementation.
+- User settings are persisted in browser-managed extension storage only.
+
+## Suggested Evolution Plan
+
+### Phase A: Stabilize Current Flow
+
+- Consolidate blocked counter ownership into one storage namespace.
+- Align popup reset flow with background message contract.
+- Add unit tests for scoring threshold behavior and mode gating.
+
+### Phase B: Real Classifier Integration
+
+- Introduce provider adapter layer (local model or remote API).
+- Add request timeout, retry, and fallback behavior.
+- Add privacy-safe telemetry for model confidence and false positives.
+
+### Phase C: Policy and Control Plane
+
+- Implement editable trusted-site allowlist and temporary per-site pause.
+- Add per-category thresholds (NSFW and gore independently).
+- Add explainability UI in popup for why an image was blocked.
