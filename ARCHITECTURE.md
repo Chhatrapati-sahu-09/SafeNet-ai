@@ -84,6 +84,48 @@ SafeNet AI is a Chrome Extension (Manifest V3) that protects users from sensitiv
 5. Popup reflects state and allows user updates to toggles/mode.
 6. Storage and runtime messages propagate updates across contexts.
 
+## Mermaid Diagrams
+
+### Component Architecture
+
+```mermaid
+flowchart LR
+  U[User] --> P[Popup UI\npopup.html + popup.js]
+  P -->|chrome.runtime.sendMessage| B[Background Service Worker\nbackground.js]
+  P -->|chrome.storage.sync/local| S[(Chrome Storage)]
+
+  W[Web Page DOM] --> C[Content Script\ncontent.js]
+  C -->|Scan and Score Images| W
+  C -->|Shield and Label Risky Images| W
+  C -->|Read/Write mode and blocked| S
+  C -->|runtime updates| B
+
+  B -->|Initialize defaults| S
+  O[Options Page\noptions.html + options.js] -->|Read settings| S
+```
+
+### Runtime Sequence (Simplified)
+
+```mermaid
+sequenceDiagram
+  participant Page as Web Page
+  participant Content as content.js
+  participant Storage as chrome.storage
+  participant Popup as popup.js
+  participant BG as background.js
+
+  Content->>Storage: Read mode + filter settings
+  Content->>Page: Scan images and infer risk
+  Content->>Page: Blur + label if threshold exceeded
+  Content->>Storage: Update blocked counter (local)
+  Content->>BG: Send updateBlockCount message
+
+  Popup->>Storage: Read toggles/mode/count
+  Popup->>BG: Send updateNsfwFilter / updateGoreFilter
+  BG->>Storage: Persist sync settings
+  Storage-->>Content: onChanged event triggers rescan
+```
+
 ## Known Constraints
 
 - Placeholder model scoring is keyword-based and not true image AI.
